@@ -13,24 +13,23 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/supabase_client";
 
 export default function Header() {
-    const [user] = useUser()
-    const router = useRouter()
-    if(user == "no user") router.replace("/signin")
+  const [user] = useUser();
+  const router = useRouter();
+  if (user == "no user") router.replace("/signin");
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/signin")
-  }
-
+    await supabase.auth.signOut();
+    router.push("/signin");
+  };
 
   return (
     <div className="w-full backdrop-blur-md bg-white/5 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            href="dashboard" 
-            prefetch 
+          <Link
+            href="dashboard"
+            prefetch
             className="text-xl font-medium text-white hover:opacity-80 transition-opacity duration-200"
           >
             Imagine
@@ -48,10 +47,12 @@ export default function Header() {
                   alt="avatar"
                   className="h-8 w-8 rounded-full ring-2 ring-white/20"
                 />
-                <span className="text-white font-medium">{user?.user_metadata.name}</span>
+                <span className="text-white font-medium">
+                  {user?.user_metadata.name}
+                </span>
               </div>
             </DropdownMenuTrigger>
-            
+
             <DropdownMenuContent className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl overflow-hidden mt-2">
               <Link href="/dashboard">
                 <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer px-4 py-2">
@@ -69,7 +70,7 @@ export default function Header() {
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-red-300 hover:bg-white/10 cursor-pointer px-4 py-2"
                 onClick={signOut}
               >

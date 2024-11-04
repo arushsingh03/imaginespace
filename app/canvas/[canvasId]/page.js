@@ -84,6 +84,8 @@ export default function CanvasPage() {
   };
   const [prompt, setPrompt] = useState("");
   const [imageParams, setImageParams] = useState(initialParams);
+  console.log(imageParams);
+
   return (
     <div className="min-h-screen bg">
       <Header />
@@ -135,11 +137,11 @@ export default function CanvasPage() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               className="min-h-[30vh] bg-transparent border-white/80 text-white resize-none p-4 focus:ring-2 ring-cyan-500/50 transition-all"
-              placeholder="Enter your prompt here..."
+              placeholder="Enter your prompt here... "
             />
           </div>
 
-          <button className="w-full py-3 px-6 bg-gradient-to-r  from-violet-500 to-fuchsia-500 rounded-lg font-medium text-white hover:opacity-80 transition-all duration-200 shadow-lg shadow-blue-500/20">
+          <button className="w-full py-3 px-6 bg-gradient-to-r  from-violet-500 to-fuchsia-500 rounded-lg font-medium text-white hover:opacity-80 transition-all duration-200 shadow-lg shadow-white/40 ring-offset-0 hover:shadow-white/80">
             Generate
           </button>
         </div>
@@ -160,10 +162,12 @@ export default function CanvasPage() {
             <h3 className="text-lg font-medium text-white/90">Model</h3>
             <Select
               value={imageParams.model}
-              onValueChange={(value) => (curr) => ({
-                ...curr,
-                model: value,
-              })}
+              onValueChange={(value) =>
+                setImageParams((curr) => ({
+                  ...curr,
+                  model: value,
+                }))
+              }
             >
               <SelectTrigger className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 transition-colors">
                 <SelectValue placeholder="Select the version" />
@@ -199,7 +203,14 @@ export default function CanvasPage() {
                     setImageParams((curr) => ({ ...curr, dimension }))
                   }
                   key={dimension.id}
-                  className="px-3 py-2 text-sm border border-white/20 rounded-lg hover:bg-white/10 transition-colors duration-200"
+                  className={`px-3 py-2 text-sm border border-white/20 rounded-lg hover:bg-white/10 transition-colors duration-200
+                    ${
+                      imageParams.dimension.height == dimension.height &&
+                      imageParams.dimension.width == dimension.width
+                        ? "bg-white text-black smooth"
+                        : ""
+                    }
+                    `}
                 >
                   {`${dimension.width} x ${dimension.height}`}
                 </button>
@@ -248,7 +259,10 @@ export default function CanvasPage() {
                     setImageParams((curr) => ({ ...curr, number: number.name }))
                   }
                   key={number.value}
-                  className="px-3 py-2 text-sm border border-white/20 rounded-lg hover:bg-white/10 transition-colors duration-200"
+                  className={`px-3 py-2 text-sm border border-white/20 rounded-lg hover:bg-white/10 transition-colors duration-200 ${
+                    imageParams.number == number.name &&
+                    "bg-white text-black smooth"
+                  }`}
                 >
                   {number.name}
                 </button>

@@ -3,14 +3,17 @@
 import { supabase } from "@/supabase_client";
 
 export default function SignInPage() {
-    const signInUser = async () => {
-        await supabase.auth.signInWithOAuth({
-            provider: "google"
-        })
-    }
+  const signInUser = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+  };
   return (
     <div className="min-h-[100vh] bg items-center flex justify-center w-full p-12">
-      <button className="button flex items-center space-x-2 px-4 py-2" onClick={signInUser}>
+      <button
+        className="button flex items-center space-x-2 px-4 py-2"
+        onClick={signInUser}
+      >
         <img
           src="/google-new.svg"
           alt="google"
