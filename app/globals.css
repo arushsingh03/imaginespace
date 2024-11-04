@@ -2,3 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .link {
+    @apply text-lg text-white transition-opacity duration-200 hover:opacity-80;
+  }
+
+  .smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .label {
+    @apply text-sm cursor-pointer hover:opacity-50 smooth;
+  }
+
+  .dropmenu_item {
+    @apply cursor-pointer flex items-center px-4 py-2 text-white hover:bg-white/10 transition-colors duration-200;
+  }
+  .button {
+    @apply bg-white/10 border border-white/5 px-12 py-3 rounded-lg shadow-lg backdrop-blur-sm w-auto cursor-pointer text-sm font-medium text-white hover:bg-white/20 hover:text-white smooth;
+  }
+  .editing_command {
+    @apply py-4 border-b w-full cursor-pointer smooth hover:text-white hover:border-white px-2;
+  }
+  .progress {
+    @apply w-1/2 bg-white/20 border border-black/10 h-2;
+  }
+  .bg {
+    @apply bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500
+  }
+}
+
+@layer base {
+  :root {
+    --background: 261 83% 58%;
+    --foreground: 210 40% 98%;
+
+    --card: 261 83% 58%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 261 83% 58%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 261 83% 58%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 261 83% 58%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
