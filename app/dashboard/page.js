@@ -8,6 +8,7 @@ import Header from "../(comps)/header";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabase_client";
 import { FilePlus2 } from "lucide-react";
+import GalaxyBackground from "../(comps)/galaxy";
 
 export default function DashboardPage() {
   const [canvasItems, setCanvasItems] = useState([]);
@@ -36,6 +37,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen w-full bg">
+      <GalaxyBackground />
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="w-full flex justify-end py-6">

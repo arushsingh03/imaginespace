@@ -28,8 +28,8 @@
     @apply w-1/2 bg-white/20 border border-black/10 h-2;
   }
   .bg {
-    @apply bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500;
-  }
+    @apply bg-gradient-to-br from-black via-slate-950 to-gray-950;
+}
 }
 
 @layer base {
@@ -73,4 +73,30 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
 }

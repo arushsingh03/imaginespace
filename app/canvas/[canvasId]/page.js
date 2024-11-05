@@ -1,5 +1,6 @@
 "use client";
 
+import GalaxyBackground from "@/app/(comps)/galaxy";
 import Header from "@/app/(comps)/header";
 import {
   Select,
@@ -9,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import useUser from "@/hooks/useUser";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 
 const filters = [
@@ -84,7 +87,28 @@ export default function CanvasPage() {
   };
   const [prompt, setPrompt] = useState("");
   const [imageParams, setImageParams] = useState(initialParams);
-  console.log(imageParams);
+  const { canvasId } = useParams();
+  const [user] = useUser();
+  const generateImages = async () => {
+    if (prompt.trim() == "" || !prompt) return;
+    let payload = {
+      prompt,
+      imageParams,
+      canvas: canvasId,
+      userId: user.id,
+    }
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg">
@@ -92,6 +116,7 @@ export default function CanvasPage() {
       <div className="grid grid-cols-5 w-full text-white min-h-screen">
         {/* Left Sidebar - Filters + Prompt */}
         <div className="col-span-1 min-h-screen overflow-y-auto py-8 px-6 space-y-8 backdrop-blur-sm bg-white/5">
+          <GalaxyBackground />
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-medium text-white/90">Filter</h3>
@@ -141,13 +166,17 @@ export default function CanvasPage() {
             />
           </div>
 
-          <button className="w-full py-3 px-6 bg-gradient-to-r  from-violet-500 to-fuchsia-500 rounded-lg font-medium text-white hover:opacity-80 transition-all duration-200 shadow-lg shadow-white/40 ring-offset-0 hover:shadow-white/80">
+          <button
+            onClick={generateImages}
+            className="w-full py-3 px-6 bg-gradient-to-r  from-violet-950 to-fuchsia-950 rounded-lg font-medium text-white hover:opacity-80 transition-all duration-200 shadow-lg shadow-white/40 ring-offset-0 hover:shadow-white/80"
+          >
             Generate
           </button>
         </div>
 
         {/* Center - Image Display */}
         <div className="col-span-3 border-x border-white/10 backdrop-blur-sm bg-white/5">
+          {/* Galaxy Effect for later */}
           <div className="h-full w-full flex items-center justify-center p-8">
             <div className="text-center text-white/60">
               Your generated images will appear here
@@ -157,6 +186,7 @@ export default function CanvasPage() {
 
         {/* Right Sidebar - Parameters */}
         <div className="col-span-1 min-h-screen overflow-y-auto py-8 px-6 space-y-8 backdrop-blur-sm bg-white/5">
+          <GalaxyBackground />
           {/* Model Selection */}
           <div className="space-y-4 pb-6 border-b border-white/10">
             <h3 className="text-lg font-medium text-white/90">Model</h3>
@@ -207,7 +237,7 @@ export default function CanvasPage() {
                     ${
                       imageParams.dimension.height == dimension.height &&
                       imageParams.dimension.width == dimension.width
-                        ? "bg-white text-black smooth"
+                        ? "bg-white text-black hover:text-white smooth"
                         : ""
                     }
                     `}
@@ -261,7 +291,7 @@ export default function CanvasPage() {
                   key={number.value}
                   className={`px-3 py-2 text-sm border border-white/20 rounded-lg hover:bg-white/10 transition-colors duration-200 ${
                     imageParams.number == number.name &&
-                    "bg-white text-black smooth"
+                    "bg-white text-black hover:text-white smooth"
                   }`}
                 >
                   {number.name}
