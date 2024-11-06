@@ -9,10 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Textarea } from "@/components/ui/textarea";
 import useUser from "@/hooks/useUser";
+import { supabase } from "@/supabase_client";
+import { Download, Edit, X } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const filters = [
   { name: "Photorealism", value: "Photorealism" },
@@ -87,8 +99,13 @@ export default function CanvasPage() {
   };
   const [prompt, setPrompt] = useState("");
   const [imageParams, setImageParams] = useState(initialParams);
+  const [createdImages, setCreatedImages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { canvasId } = useParams();
   const [user] = useUser();
+  const [selectedImage, setSelectedImage] = useState("");
+  const [OpenDialog, setOpenDialog] = useState(false);
+  const [editingCommand, setEditingCommand] = useState("");
   const generateImages = async () => {
     if (prompt.trim() == "" || !prompt) return;
     let payload = {
@@ -96,7 +113,7 @@ export default function CanvasPage() {
       imageParams,
       canvas: canvasId,
       userId: user.id,
-    }
+    };
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -107,8 +124,28 @@ export default function CanvasPage() {
       });
     } catch (error) {
       console.error(error);
+    } finally {
+      setTimeout(() => {
+        fetchNewImages();
+      }, 3000);
     }
   };
+  const fetchNewImages = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("images_created")
+      .select()
+      .eq("canvas_id", canvasId)
+      .order("created_at", { ascending: false });
+    setCreatedImages(data);
+    setLoading(false);
+    setPrompt("");
+    setImageParams(initialParams);
+  };
+  useEffect(() => {
+    if (!supabase || !canvasId) return;
+    fetchNewImages();
+  }, [supabase, canvasId]);
 
   return (
     <div className="min-h-screen bg">
@@ -175,15 +212,200 @@ export default function CanvasPage() {
         </div>
 
         {/* Center - Image Display */}
-        <div className="col-span-3 border-x border-white/10 backdrop-blur-sm bg-white/5">
-          {/* Galaxy Effect for later */}
-          <div className="h-full w-full flex items-center justify-center p-8">
-            <div className="text-center text-white/60">
-              Your generated images will appear here
+        <div className="col-span-3 items-center justify-start w-full flex flex-col min-h-screen border-x border-white/10">
+          {selectedImage && (
+            <div className="w-full sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
+              <div className="flex items-center justify-between px-6 py-4">
+                <div className="flex items-center gap-4">
+                  <Link
+                    href={selectedImage.url}
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-md border border-white/10 hover:bg-white/5"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </Link>
+                  <Dialog open={OpenDialog}>
+                    <DialogTrigger
+                      onClick={() => setOpenDialog(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-md border border-white/10 hover:bg-white/5"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </DialogTrigger>
+                    <DialogContent
+                      onInteractOutside={() => setOpenDialog(false)}
+                      className="bg-black/95 text-white py-8 filter backdrop-blur-md border-white/20 border"
+                    >
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-semibold mb-4">
+                          What do you want to do with this image?
+                        </DialogTitle>
+                        <DialogDescription>
+                          <div className="w-full items-center justify-center flex flex-col space-y-3">
+                            <div className="w-full py-4 max-h-[60vh] overflow-y-auto pr-4">
+                              {/* Remove bg */}
+                              <div
+                                onClick={() =>
+                                  setEditingCommand("Remove Background")
+                                }
+                                className={`p-4 rounded-lg transition-all duration-200 cursor-pointer ${
+                                  editingCommand === "Remove Background"
+                                    ? "bg-white/10 border border-white"
+                                    : "hover:bg-white/5 border border-white/10"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">
+                                  Remove Background
+                                </p>
+                                {editingCommand === "Remove Background" && (
+                                  <p className="text-xs text-white/60 mt-1 italic">
+                                    remove the background of this image
+                                  </p>
+                                )}
+                              </div>
+                              {/* upscale */}
+                              <div
+                                onClick={() => setEditingCommand("upscale")}
+                                className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
+                                  editingCommand === "upscale"
+                                    ? "bg-white/10 border border-white"
+                                    : "hover:bg-white/5 border border-white/10"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">Upscale</p>
+                                {editingCommand === "upscale" && (
+                                  <p className="text-xs text-white/60 mt-1 italic">
+                                    create higher-quality image from this image
+                                  </p>
+                                )}
+                              </div>
+                              {/* caption */}
+                              <div
+                                onClick={() => setEditingCommand("captionize")}
+                                className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
+                                  editingCommand === "captionize"
+                                    ? "bg-white/10 border border-white"
+                                    : "hover:bg-white/5 border border-white/10"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">
+                                  Captionize
+                                </p>
+                                {editingCommand === "captionize" && (
+                                  <p className="text-xs text-white/60 mt-1 italic">
+                                    generate detailed caption for this images
+                                  </p>
+                                )}
+                              </div>
+                              {/* restore ai_face */}
+                              <div
+                                onClick={() =>
+                                  setEditingCommand("restore faces")
+                                }
+                                className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
+                                  editingCommand === "restore faces"
+                                    ? "bg-white/10 border border-white"
+                                    : "hover:bg-white/5 border border-white/10"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">
+                                  Restore Faces
+                                </p>
+                                {editingCommand === "restore faces" && (
+                                  <p className="text-xs text-white/60 mt-1 italic">
+                                    face restoration for any AI-generated faces
+                                    in this image
+                                  </p>
+                                )}
+                              </div>
+                              {/* restore old_photo */}
+                              <div
+                                onClick={() =>
+                                  setEditingCommand("restore old photo")
+                                }
+                                className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
+                                  editingCommand === "restore old photo"
+                                    ? "bg-white/10 border border-white"
+                                    : "hover:bg-white/5 border border-white/10"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">
+                                  Recover Old Images
+                                </p>
+                                {editingCommand === "restore old photo" && (
+                                  <p className="text-xs text-white/60 mt-1 italic">
+                                    bring your old photos back to life
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedImage("");
+                    setPrompt("");
+                  }}
+                  className="p-2 rounded-md hover:bg-white/5 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Horizontal scrolling image gallery */}
+          <div className="w-full flex-none">
+            <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="flex min-h-[400px] space-x-4 p-6">
+                {createdImages.map((image) => (
+                  <div
+                    key={image.id}
+                    className={`flex-none group relative w-[300px] h-[300px] overflow-hidden rounded-lg border transition-all duration-200 
+              ${
+                image.url === selectedImage?.url
+                  ? "border-white ring-2 ring-white"
+                  : "border-white/10 hover:border-white/20"
+              }`}
+                  >
+                    <img
+                      onClick={() => {
+                        setSelectedImage(image);
+                        setPrompt(image.prompt);
+                        setImageParams((curr) => ({
+                          ...curr,
+                          model: models[2].version,
+                        }));
+                      }}
+                      src={image.url}
+                      alt={image.prompt}
+                      className="w-full h-full object-cover cursor-pointer transition-opacity duration-200 group-hover:opacity-75"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
+          {/* Empty state */}
+          {createdImages.length === 0 && (
+            <div className="h-[400px] w-full flex items-center justify-center">
+              <div className="text-center text-white/60">
+                Your generated images will appear here
+              </div>
+            </div>
+          )}
+
+          {/* Space for edited images below */}
+          <div className="w-full flex-1">
+            {/* Your edited images content will go here */}
+          </div>
+        </div>
         {/* Right Sidebar - Parameters */}
         <div className="col-span-1 min-h-screen overflow-y-auto py-8 px-6 space-y-8 backdrop-blur-sm bg-white/5">
           <GalaxyBackground />

@@ -1,6 +1,6 @@
+import { supabase } from "@/supabase_client";
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
-import { supabase } from "@/supabase_client";
 
 const replicate = new Replicate({
   auth: `${process.env.REPLICATE_API_TOKEN}`,
@@ -34,7 +34,7 @@ export async function POST(req, res) {
     let Response_Id = startResponse.id;
     let output = null;
     while (!output) {
-      // loop in 1s interval until we get response
+      // Loop in 1s intervals until the alt text is ready
       let finalResponse = await replicate.predictions.get(Response_Id);
       if (finalResponse.status === "succeeded") {
         output = finalResponse.output;
@@ -55,7 +55,7 @@ export async function POST(req, res) {
         },
       ]);
     }
-    return NextResponse.json(output ? output : "Failed to retrieve");
+    return NextResponse.json(output ? output : "Failed to retreive");
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 400 });
   }
