@@ -55,7 +55,7 @@ export async function POST(req, res) {
         },
       ]);
     }
-    return NextResponse.json(output ? output : "Failed to retreive");
+    return NextResponse.json(output ? output : "Failed to retrieve");
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 400 });
   }

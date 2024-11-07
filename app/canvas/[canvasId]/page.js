@@ -100,12 +100,16 @@ export default function CanvasPage() {
   const [prompt, setPrompt] = useState("");
   const [imageParams, setImageParams] = useState(initialParams);
   const [createdImages, setCreatedImages] = useState([]);
+  const [editedImages, setEditedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const { canvasId } = useParams();
   const [user] = useUser();
   const [selectedImage, setSelectedImage] = useState("");
   const [OpenDialog, setOpenDialog] = useState(false);
-  const [editingCommand, setEditingCommand] = useState("");
+  const [editingCommand, setEditingCommand] = useState(
+    "Choose Editing Command"
+  );
+  const [loadingEditing, setLoadingEditing] = useState(false);
   const generateImages = async () => {
     if (prompt.trim() == "" || !prompt) return;
     let payload = {
@@ -132,13 +136,22 @@ export default function CanvasPage() {
   };
   const fetchNewImages = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("images_created")
-      .select()
-      .eq("canvas_id", canvasId)
-      .order("created_at", { ascending: false });
-    setCreatedImages(data);
+    const [images, editedImgs] = await Promise.all([
+      await supabase
+        .from("images_created")
+        .select()
+        .eq("canvas_id", canvasId)
+        .order("created_at", { ascending: false }),
+      await supabase
+        .from("images_edited")
+        .select()
+        .eq("canvas_id", canvasId)
+        .order("created_at", { ascending: false }),
+    ]);
+    setCreatedImages(images.data);
+    setEditedImages(editedImgs.data);
     setLoading(false);
+    setSelectedImage("");
     setPrompt("");
     setImageParams(initialParams);
   };
@@ -146,6 +159,34 @@ export default function CanvasPage() {
     if (!supabase || !canvasId) return;
     fetchNewImages();
   }, [supabase, canvasId]);
+
+  const editImage = async () => {
+    if (!selectedImage || loadingEditing) return;
+    setLoadingEditing(true);
+    let payload = {
+      imageUrl: selectedImage.url,
+      command: editingCommand,
+      canvas: canvasId,
+      userId: user.id,
+    };
+    try {
+      const res = await fetch("/api/edit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setOpenDialog(false);
+      setLoadingEditing(false);
+      setTimeout(() => {
+        fetchNewImages();
+      }, 2000);
+    }
+  };
 
   return (
     <div className="min-h-screen bg">
@@ -238,6 +279,7 @@ export default function CanvasPage() {
                       className="bg-black/95 text-white py-8 filter backdrop-blur-md border-white/20 border"
                     >
                       <DialogHeader>
+                        <GalaxyBackground />
                         <DialogTitle className="text-xl font-semibold mb-4">
                           What do you want to do with this image?
                         </DialogTitle>
@@ -266,15 +308,15 @@ export default function CanvasPage() {
                               </div>
                               {/* upscale */}
                               <div
-                                onClick={() => setEditingCommand("upscale")}
+                                onClick={() => setEditingCommand("Upscale")}
                                 className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
-                                  editingCommand === "upscale"
+                                  editingCommand === "Upscale"
                                     ? "bg-white/10 border border-white"
                                     : "hover:bg-white/5 border border-white/10"
                                 }`}
                               >
                                 <p className="font-medium text-sm">Upscale</p>
-                                {editingCommand === "upscale" && (
+                                {editingCommand === "Upscale" && (
                                   <p className="text-xs text-white/60 mt-1 italic">
                                     create higher-quality image from this image
                                   </p>
@@ -282,9 +324,9 @@ export default function CanvasPage() {
                               </div>
                               {/* caption */}
                               <div
-                                onClick={() => setEditingCommand("captionize")}
+                                onClick={() => setEditingCommand("Captionize")}
                                 className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
-                                  editingCommand === "captionize"
+                                  editingCommand === "Captionize"
                                     ? "bg-white/10 border border-white"
                                     : "hover:bg-white/5 border border-white/10"
                                 }`}
@@ -292,7 +334,7 @@ export default function CanvasPage() {
                                 <p className="font-medium text-sm">
                                   Captionize
                                 </p>
-                                {editingCommand === "captionize" && (
+                                {editingCommand === "Captionize" && (
                                   <p className="text-xs text-white/60 mt-1 italic">
                                     generate detailed caption for this images
                                   </p>
@@ -301,10 +343,10 @@ export default function CanvasPage() {
                               {/* restore ai_face */}
                               <div
                                 onClick={() =>
-                                  setEditingCommand("restore faces")
+                                  setEditingCommand("Restore Faces")
                                 }
                                 className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
-                                  editingCommand === "restore faces"
+                                  editingCommand === "Restore Faces"
                                     ? "bg-white/10 border border-white"
                                     : "hover:bg-white/5 border border-white/10"
                                 }`}
@@ -312,7 +354,7 @@ export default function CanvasPage() {
                                 <p className="font-medium text-sm">
                                   Restore Faces
                                 </p>
-                                {editingCommand === "restore faces" && (
+                                {editingCommand === "Restore Faces" && (
                                   <p className="text-xs text-white/60 mt-1 italic">
                                     face restoration for any AI-generated faces
                                     in this image
@@ -322,10 +364,10 @@ export default function CanvasPage() {
                               {/* restore old_photo */}
                               <div
                                 onClick={() =>
-                                  setEditingCommand("restore old photo")
+                                  setEditingCommand("Recover Old Images")
                                 }
                                 className={`p-4 rounded-lg transition-all duration-200 cursor-pointer mt-3 ${
-                                  editingCommand === "restore old photo"
+                                  editingCommand === "Recover Old Images"
                                     ? "bg-white/10 border border-white"
                                     : "hover:bg-white/5 border border-white/10"
                                 }`}
@@ -333,13 +375,21 @@ export default function CanvasPage() {
                                 <p className="font-medium text-sm">
                                   Recover Old Images
                                 </p>
-                                {editingCommand === "restore old photo" && (
+                                {editingCommand === "Recover Old Images" && (
                                   <p className="text-xs text-white/60 mt-1 italic">
                                     bring your old photos back to life
                                   </p>
                                 )}
                               </div>
                             </div>
+                          </div>
+                          <div className="flex justify-center">
+                            <button
+                              className="w-[250px] py-3 px-6 bg-gradient-to-r from-violet-950 to-fuchsia-950 rounded-lg font-medium text-white hover:opacity-80 transition-all duration-200 shadow-lg shadow-white/40 ring-offset-0 hover:shadow-white/80"
+                              onClick={editImage}
+                            >
+                              {loadingEditing ? "Loading..." : editingCommand}
+                            </button>
                           </div>
                         </DialogDescription>
                       </DialogHeader>
@@ -388,6 +438,38 @@ export default function CanvasPage() {
                     />
                   </div>
                 ))}
+              </div>
+              {/* edited images */}
+              <div className="items-center justify-start flex max-w-[100%] overflow-x-scroll min-h-[400px] space-x-4 p-6">
+                {editedImages.map((image) =>
+                  !image.caption ? (
+                    <img
+                      key={image.id}
+                      src={image.url}
+                      alt={image.url}
+                      onClick={() => {
+                        selectedImage(image);
+                        setPrompt(image.prompt);
+                        setImageParams((curr) => ({
+                          ...curr,
+                          model: models[2].version,
+                        }));
+                      }}
+                      className="w-[300px] h-[300px] cursor-pointer hover:opacity-50 smooth object-center object-contain border border-white/20"
+                    />
+                  ) : (
+                    <div
+                      className="text-white py-12 min-w-[300px] min-h-[300px] flex items-center justify-center border border-white/20 relative px-6"
+                      key={image.id}
+                    >
+                      <p className="w-full">{image.caption}</p>
+                      <img
+                        src={image.url}
+                        className="absolute w-full h-full z-0 opacity-10"
+                      />
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>

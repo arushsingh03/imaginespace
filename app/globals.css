@@ -51,7 +51,7 @@ background-color: #B865CB;
     @apply py-4 border-b w-full cursor-pointer smooth hover:text-white hover:border-white px-2;
   }
   .progress {
-    @apply w-1/2 bg-white/20 border border-black/10 h-2;
+    @apply w-1/2 bg-black border border-black/10 h-2;
   }
   .bg {
     @apply bg-gradient-to-br from-black via-slate-950 to-gray-950;
