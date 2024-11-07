@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [user] = useUser();
   const router = useRouter();
   const id = uuidv4();
+
   const createNewCanvas = async () => {
     await supabase
       .from("canvas")
@@ -22,59 +23,63 @@ export default function DashboardPage() {
       .select();
     router.replace(`/canvas/${id}`);
   };
+
   const fetchCanvas = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("canvas")
       .select()
       .eq("user_id", user?.id)
       .order("created_at", { ascending: false });
     setCanvasItems(data);
   };
+
   useEffect(() => {
     if (!user || !supabase) return;
     fetchCanvas();
   }, [supabase, user]);
 
   return (
-    <div className="min-h-screen w-full bg">
+    <div className="min-h-screen bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 text-gray-200 flex flex-col items-center">
       <GalaxyBackground />
       <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl w-full flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+        
+        {/* New Canvas Button */}
         <div className="w-full flex justify-end py-6">
           <button
             onClick={createNewCanvas}
-            className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300 flex items-center space-x-2"
+            className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-fuchsia-600 hover:to-violet-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
           >
             <FilePlus2 className="size-5" />
             <span>New Canvas</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-8">
+        {/* Canvas Items Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8 w-full">
           {canvasItems.map((item, i) => (
             <Link
               key={item.id}
               href={`/canvas/${item.id}`}
-              className="group relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-300"
+              className="group relative overflow-hidden rounded-xl bg-purple-950 text-white shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative p-6">
-                <div className="text-white text-lg font-medium">
+                <div className="text-gray-100 text-lg font-medium">
                   Canvas {i + 1}
                 </div>
-                <div className="mt-2 text-white/60">
+                <div className="mt-2 text-gray-300">
                   Click to open this canvas
                 </div>
               </div>
             </Link>
           ))}
 
+          {/* No Canvases Message */}
           {canvasItems.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-white/80">
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-300">
               <div className="text-xl font-medium mb-4">No canvases yet</div>
-              <div className="text-white/60">
-                Create your first canvas to get started
-              </div>
+              <div>Create your first canvas to get started</div>
             </div>
           )}
         </div>

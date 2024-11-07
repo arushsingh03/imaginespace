@@ -47,13 +47,13 @@ export default function SignInPage() {
     await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: `${window.location.origin}/dashboard`, // directs users to "/dashboard" after sign-in
+        redirectTo: `${window.location.origin}/dashboard`,
       },
     });
   };
 
   return (
-    <div className="min-h-[100vh] bg items-center flex justify-center w-full p-12 relative overflow-hidden">
+    <div className="min-h-[100vh] bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 items-center flex justify-center w-full p-12 relative overflow-hidden">
       <GalaxyBackground />
 
       {/* Floating stars decoration */}
@@ -78,7 +78,7 @@ export default function SignInPage() {
         </div>
 
         {/* Main card */}
-        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 border border-white/10 shadow-2xl mt-20">
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 border border-white shadow-2xl mt-20">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
               Welcome to Imagine Space

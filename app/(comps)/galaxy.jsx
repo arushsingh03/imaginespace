@@ -9,14 +9,17 @@ const GalaxyBackground = () => {
     const generateStars = () => {
       const newStars = [];
       // Increased number of stars and adjusted size range
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 300; i++) {
         newStars.push({
           id: i,
           x: Math.random() * 100,
           y: Math.random() * 100,
           size: Math.random() * 1.5 + 0.5, // Smaller stars
           opacity: Math.random(),
-          speed: Math.random() * 2.5 + 1.5, // Adjusted speed
+          speed: Math.random() * 4 + 2, // Faster speed
+          isShootingStar: Math.random() < 0.01, // Chance of being a shooting star
+          shootingStarLength: Math.random() * 20 + 10, // Length of the shooting star
+          shootingStarAngle: Math.random() * 2 * Math.PI, // Angle of the shooting star
         });
       }
       setStars(newStars);
@@ -28,11 +31,14 @@ const GalaxyBackground = () => {
       setStars((prevStars) =>
         prevStars.map((star) => ({
           ...star,
-          x: (star.x + star.speed * 0.05) % 100, // Slower movement
-          opacity: 0.4 + Math.sin((Date.now() / 1000) * star.speed) * 0.6,
+          x: (star.x + star.speed * 0.1 * Math.cos(star.shootingStarAngle)) % 100, // Shooting star movement
+          y: (star.y + star.speed * 0.1 * Math.sin(star.shootingStarAngle)) % 100,
+          opacity: star.isShootingStar
+            ? Math.max(0, star.opacity - 0.02) // Decrease opacity for shooting stars
+            : 0.4 + Math.sin((Date.now() / 1000) * star.speed) * 0.6,
         }))
       );
-    }, 50);
+    }, 30); // Faster animation interval
 
     return () => clearInterval(animationInterval);
   }, []);
@@ -43,14 +49,20 @@ const GalaxyBackground = () => {
         {stars.map((star) => (
           <div
             key={star.id}
-            className="absolute rounded-full bg-white"
+            className={`absolute rounded-full bg-white ${
+              star.isShootingStar
+                ? `w-[${star.shootingStarLength}px] h-[2px] -rotate-[${
+                    star.shootingStarAngle * (180 / Math.PI)
+                  }deg]`
+                : ""
+            }`}
             style={{
               left: `${star.x}%`,
               top: `${star.y}%`,
               width: `${star.size}px`,
               height: `${star.size}px`,
               opacity: star.opacity,
-              transition: "opacity 0.5s ease-in-out",
+              transition: "opacity 0.3s ease-in-out",
               boxShadow: "0 0 2px 1px rgba(255, 255, 255, 0.3)", // Reduced glow
             }}
           />

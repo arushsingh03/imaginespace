@@ -6,18 +6,19 @@ import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabase_client";
-import GalaxyBackground from "../(comps)/galaxy";
-import { FileCog, ImagePlus } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { ImagePlus, FileCog } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import GalaxyBackground from "../(comps)/galaxy";
 
-export default function UsagePage() {
+const UsagePage = () => {
   const [user] = useUser();
   if (user == "no user") redirect("/signin");
   const [imagesUsage, setImagesUsage] = useState({
     created: 0,
     edited: 0,
   });
+
   const fetchImages = async () => {
     const today = new Date();
     const thirtyDaysAgo = new Date();
@@ -40,55 +41,82 @@ export default function UsagePage() {
       edited: editedImgs.data.length,
     });
   };
+
   useEffect(() => {
     if (!supabase || user == "no user" || !user) return;
     fetchImages();
   }, [supabase, user]);
 
+  const data = [
+    { name: "Images Generated", value: imagesUsage.created },
+    { name: "Images Edited", value: imagesUsage.edited },
+  ];
+
+  const COLORS = ["#a855f7", "#c084fc"];
+
   return (
-    <div className="bg-gray-950 min-h-screen w-full flex flex-col items-center justify-start">
+    <div className="bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 min-h-screen w-full flex flex-col items-center justify-start">
+      <GalaxyBackground />
       <Header />
       <motion.div
-        className="w-full max-w-2xl my-8"
+        className="w-full max-w-2xl my-12"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-full mt-12 h-96 bg-gradient-to-r from-violet-950 to-fuchsia-950 border-[4px] border-white/20">
-          <GalaxyBackground />
-          <CardHeader className="bg-transparent">
-            <CardTitle className="text-white font-semibold text-xl">
-              Usage in the last 30 days
+        <Card className="w-full bg-gradient-to-r from-gray-900 to-violet-950 rounded-2xl">
+          <CardHeader className="bg-transparent px-8 pt-8">
+            <CardTitle className="text-white font-semibold text-2xl mb-2">
+              Your Usage in the Last 30 Days
             </CardTitle>
-            <hr className="border-t-2 border-white/20 my-4" />
+            <p className="text-white/80 m-2">
+              Track your image generation and editing activity on Imagine Space.
+            </p>
           </CardHeader>
-          <CardContent className="text-white mt-12">
-            <div className="space-y-20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <ImagePlus size={28} className="text-white" />
-                  <p className="font-medium">Images generated</p>
+          <CardContent className="px-8 pb-8">
+            <div className="grid grid-cols-2 gap-8">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-violet-500 rounded-full">
+                  <ImagePlus size={20} className="text-white" />
                 </div>
-                <div className="flex items-center space-x-4 font-medium">
-                  <Progress
-                    value={(imagesUsage.created / 30) * 100}
-                    className="w-48 border-[2px]"
-                  />
-                  <p>{imagesUsage.created}/30</p>
+                <div>
+                  <p className="text-white font-medium">Images Generated</p>
+                  <p className="text-white/80 text-lg font-medium">
+                    {imagesUsage.created}/30
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <FileCog size={28} className="text-white" />
-                  <p className="font-medium">Images Edited</p>
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-fuchsia-500 rounded-full">
+                  <FileCog size={20} className="text-white" />
                 </div>
-                <div className="flex items-center space-x-4 font-medium">
-                  <Progress
-                    value={(imagesUsage.edited / 30) * 100}
-                    className="w-48 border-[2px]"
-                  />
-                  <p>{imagesUsage.edited}/30</p>
+                <div>
+                  <p className="text-white font-medium">Images Edited</p>
+                  <p className="text-white/80 text-lg font-medium">
+                    {imagesUsage.edited}/30
+                  </p>
                 </div>
+              </div>
+              <div className="col-span-2">
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={data}
+                      innerRadius={60}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                      labelLine={false}
+                    >
+                      {data.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>
@@ -96,4 +124,6 @@ export default function UsagePage() {
       </motion.div>
     </div>
   );
-}
+};
+
+export default UsagePage;
