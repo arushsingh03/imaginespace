@@ -43,12 +43,12 @@ export default function Header() {
             <DropdownMenuTrigger className="focus:outline-none">
               <div className="flex items-center space-x-3 bg-white/10 rounded-full pl-2 pr-4 py-1.5 hover:bg-white/20 transition-colors duration-200">
                 <img
-                  src={user?.user_metadata.picture}
+                  src={user?.user_metadata?.picture}
                   alt="avatar"
                   className="h-8 w-8 rounded-full ring-2 ring-white/20"
                 />
                 <span className="text-white font-medium">
-                  {user?.user_metadata.name}
+                  {user?.user_metadata?.name}
                 </span>
               </div>
             </DropdownMenuTrigger>

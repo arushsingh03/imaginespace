@@ -126,3 +126,6 @@ background-color: #B865CB;
 .animate-twinkle {
   animation: twinkle 3s ease-in-out infinite;
 }
+.double-border {
+  border-bottom-style: double;
+}
