@@ -8,7 +8,7 @@ import Header from "../(comps)/header";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabase_client";
 import { FilePlus2 } from "lucide-react";
-import GalaxyBackground from "../(comps)/galaxy";
+import AIBackground from "../(comps)/aibackground";
 
 export default function DashboardPage() {
   const [canvasItems, setCanvasItems] = useState([]);
@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 text-gray-200 flex flex-col items-center">
-      <GalaxyBackground />
+      <AIBackground />
       <Header />
       <div className="max-w-7xl w-full flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
         

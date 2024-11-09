@@ -1,7 +1,8 @@
 "use client";
 
+import { redirect } from "next/navigation"; // Import redirect from next/navigation
 import { supabase } from "@/supabase_client";
-import GalaxyBackground from "../(comps)/galaxy";
+import AIBackground from "../(comps)/aibackground";
 
 const Astronaut = () => (
   <svg
@@ -42,19 +43,23 @@ const Astronaut = () => (
   </svg>
 );
 
-export default function SignInPage() {
+const SignInPage = () => {
+  // Function to handle the sign-in with OAuth
   const signInUser = async (provider) => {
     await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}/dashboard`, // Add redirect URL after successful login
       },
     });
+
+    // Use redirect here for immediate navigation after the sign-in process
+    redirect("/dashboard"); // Redirect user to the dashboard or any other page
   };
 
   return (
     <div className="min-h-[100vh] bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 items-center flex justify-center w-full p-12 relative overflow-hidden">
-      <GalaxyBackground />
+      <AIBackground />
 
       {/* Floating stars decoration */}
       <div className="absolute inset-0 overflow-hidden">
@@ -143,4 +148,6 @@ export default function SignInPage() {
       </div>
     </div>
   );
-}
+};
+
+export default SignInPage;
