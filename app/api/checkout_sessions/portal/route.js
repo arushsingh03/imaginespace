@@ -7,7 +7,7 @@ export async function POST(req) {
   const { customer } = await req.json();
   try {
     const { protocol, host } = url.parse(req.url);
-    const baseUrl = `${protocol}//${host}`;
+    const baseUrl = `${protocol}//${host}/plans`;
     const portalSession = await stripe.billingPortal.sessions.create({
       customer,
       return_url: baseUrl,

@@ -7,9 +7,9 @@ import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabase_client";
 import { ImagePlus, FileCog } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import AIBackground from "./(comps)/aibackground";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import GalaxyBackground from "../(comps)/galaxy";
 
 const UsagePage = () => {
   const [user] = useUser();
@@ -56,7 +56,7 @@ const UsagePage = () => {
 
   return (
     <div className="bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 min-h-screen w-full flex flex-col items-center justify-start">
-      <AIBackground />
+      <GalaxyBackground />
       <Header />
       <motion.div
         className="w-full max-w-2xl my-12"

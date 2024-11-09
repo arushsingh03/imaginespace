@@ -12,9 +12,9 @@ import {
   FaCloudUploadAlt,
   FaLightbulb,
 } from "react-icons/fa";
-import AIBackground from "./(comps)/aibackground";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/supabase_client";
+import GalaxyBackground from "../(comps)/galaxy";
 
 export default function Plans() {
   const [user] = useUser();
@@ -51,7 +51,7 @@ export default function Plans() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 flex flex-col items-center justify-start text-gray-200">
-      <AIBackground />
+      <GalaxyBackground />
       <Header />
       <div className="w-full flex items-center justify-center min-h-screen">
         {/* Plans Container */}

@@ -32,7 +32,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import AIBackground from "@/app/(comps)/aibackground";
+import GalaxyBackground from "@/app/(comps)/galaxy";
 
 const filters = [
   { name: "Photorealism", value: "Photorealism" },
@@ -201,13 +201,12 @@ export default function CanvasPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 text-gray-200 flex flex-col items-center">
-      <AIBackground />
+      <GalaxyBackground />
       <Header />
       <div className="max-w-7xl w-full flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-5 w-full text-white min-h-screen">
           {/* Left Sidebar - Filters + Prompt */}
           <div className="col-span-1 min-h-screen overflow-y-auto py-8 px-6 space-y-8 backdrop-blur-sm bg-white/5">
-            <AIBackground />
             <div className="space-y-4">
               <div className="space-y-2">
                 <h3 className="text-xl font-medium text-white/90">Filter</h3>
@@ -292,7 +291,6 @@ export default function CanvasPage() {
                         className="bg-purple-300/10  text-white py-8 filter backdrop-blur-md border-white border rounded-lg shadow-lg"
                       >
                         <DialogHeader>
-                          <AIBackground />
                           <DialogTitle className="text-xl font-semibold mb-4">
                             What do you want to do with this image?
                           </DialogTitle>
@@ -514,7 +512,6 @@ export default function CanvasPage() {
 
           {/* Right Sidebar - Parameters */}
           <div className="col-span-1 min-h-screen overflow-y-auto py-8 px-6 space-y-8 backdrop-blur-sm bg-white/5">
-            <AIBackground />
             {/* Model Selection */}
             <div className="space-y-4 pb-6 border-b border-white/10">
               <h3 className="text-lg font-medium text-white/90">Model</h3>

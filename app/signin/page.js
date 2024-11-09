@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"; // Import redirect from next/navigation
 import { supabase } from "@/supabase_client";
-import AIBackground from "../(comps)/aibackground";
+import GalaxyBackground from "../(comps)/galaxy";
 
 const Astronaut = () => (
   <svg
@@ -59,7 +59,7 @@ const SignInPage = () => {
 
   return (
     <div className="min-h-[100vh] bg-gradient-to-b from-violet-950 via-fuchsia-950 to-blue-950 items-center flex justify-center w-full p-12 relative overflow-hidden">
-      <AIBackground />
+      <GalaxyBackground />
 
       {/* Floating stars decoration */}
       <div className="absolute inset-0 overflow-hidden">
