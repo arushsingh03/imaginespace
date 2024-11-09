@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import GalaxyBackground from "../(comps)/galaxy";
 import { usePlan } from "@/hooks/usePlan";
+import { supabase } from "@/supabase_client";
 
 export default function Plans() {
   const [user] = useUser();

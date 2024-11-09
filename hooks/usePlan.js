@@ -1,7 +1,8 @@
 "use client"
-import { useEffect, useState } from "react";
-import useUser from "./useUser";
+
 import axios from "axios";
+import useUser from "./useUser";
+import { useEffect, useState } from "react";
 import { supabase } from "@/supabase_client";
 
 export function usePlan() {
