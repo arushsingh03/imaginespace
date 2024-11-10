@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import useUser from "@/hooks/useUser";
-import Header from "../(comps)/header";
+import Header from "../(comps)/Header";
 import { redirect } from "next/navigation";
 import {
   FaCheckCircle,

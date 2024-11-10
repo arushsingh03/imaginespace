@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "@/app/(comps)/header";
+import Header from "@/app/(comps)/Header";
 import {
   Select,
   SelectContent,

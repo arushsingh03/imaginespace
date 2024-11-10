@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useUser from "@/hooks/useUser";
-import Header from "../(comps)/header";
+import Header from "../(comps)/Header";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabase_client";
 import { FilePlus2 } from "lucide-react";

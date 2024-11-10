@@ -1,7 +1,7 @@
 "use client";
 
 import useUser from "@/hooks/useUser";
-import Header from "../(comps)/Header";
+import Header from "../(comps)/Header"; // Ensure this is the correct casing
 import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
