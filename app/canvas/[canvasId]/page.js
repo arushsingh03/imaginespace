@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/app/(comps)/Header";
 import {
   Select,
   SelectContent,
@@ -33,6 +32,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import GalaxyBackground from "@/app/(comps)/galaxy";
+import Header from "@/app/(comps)/Header";
 
 const filters = [
   { name: "Photorealism", value: "Photorealism" },

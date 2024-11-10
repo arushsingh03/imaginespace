@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import useUser from "@/hooks/useUser";
-import Header from "../(comps)/Header";
 import { redirect } from "next/navigation";
 import {
   FaCheckCircle,
@@ -15,6 +14,7 @@ import {
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/supabase_client";
 import GalaxyBackground from "../(comps)/galaxy";
+import Header from "../(comps)/Header";
 
 export default function Plans() {
   const [user] = useUser();

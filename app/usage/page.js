@@ -1,7 +1,6 @@
 "use client";
 
 import useUser from "@/hooks/useUser";
-import Header from "../(comps)/Header"; // Ensure this is the correct casing
 import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,6 +9,7 @@ import { ImagePlus, FileCog } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import GalaxyBackground from "../(comps)/galaxy";
+import Header from "../(comps)/Header";
 
 const UsagePage = () => {
   const [user] = useUser();
