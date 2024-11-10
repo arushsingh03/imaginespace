@@ -487,6 +487,7 @@ export default function CanvasPage() {
                         <img
                           src={image.url}
                           className="absolute w-full h-full z-0 opacity-10"
+                          alt="edited image"
                         />
                       </div>
                     )
