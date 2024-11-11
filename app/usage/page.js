@@ -8,8 +8,8 @@ import { supabase } from "@/supabase_client";
 import { ImagePlus, FileCog } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import GalaxyBackground from "../(comps)/galaxy";
-import Header from "../(comps)/Header";
+import GalaxyBackground from "@/components/galaxy";
+import Header from "@/components/header";
 
 const UsagePage = () => {
   const [user] = useUser();

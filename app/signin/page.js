@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"; // Import redirect from next/navigation
 import { supabase } from "@/supabase_client";
-import GalaxyBackground from "../(comps)/galaxy";
+import GalaxyBackground from "@/components/galaxy";
 
 const Astronaut = () => (
   <svg

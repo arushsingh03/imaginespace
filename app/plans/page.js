@@ -13,8 +13,8 @@ import {
 } from "react-icons/fa";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/supabase_client";
-import GalaxyBackground from "../(comps)/galaxy";
-import Header from "../(comps)/Header";
+import Header from "@/components/header";
+import GalaxyBackground from "@/components/galaxy";
 
 export default function Plans() {
   const [user] = useUser();

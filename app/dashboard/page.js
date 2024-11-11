@@ -7,9 +7,8 @@ import useUser from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabase_client";
 import { FilePlus2 } from "lucide-react";
-import GalaxyBackground from "../(comps)/galaxy";
-import Header from "../(comps)/Header";
-
+import Header from "@/components/header";
+import GalaxyBackground from "@/components/galaxy";
 export default function DashboardPage() {
   const [canvasItems, setCanvasItems] = useState([]);
   const [user] = useUser();

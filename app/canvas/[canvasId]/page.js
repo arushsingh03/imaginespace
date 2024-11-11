@@ -31,8 +31,8 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import GalaxyBackground from "@/app/(comps)/galaxy";
-import Header from "@/app/(comps)/Header";
+import GalaxyBackground from "@/components/galaxy";
+import Header from "@/components/header";
 
 const filters = [
   { name: "Photorealism", value: "Photorealism" },
