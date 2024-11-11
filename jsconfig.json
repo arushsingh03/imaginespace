@@ -2,9 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/public/*": ["./public/*"],
-      "@/components/*": ["./components/*"],
-      "@/hooks/*": ["./hooks/*"]
+      "@/supabase_client": ["path/to/supabase_client"],
+      "@/app/(comps)/galaxy": ["app/(comps)/galaxy"],
+      "@/app/(comps)/Header": ["app/(comps)/Header"]
     }
   }
 }
