@@ -21,7 +21,7 @@ export async function POST(req, res) {
         : command == "Upscale"
         ? {
             version:
-            "f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
+              "f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
             input: {
               image: `${imageUrl}`,
               scale: 2,
@@ -60,38 +60,54 @@ export async function POST(req, res) {
             },
           }
         : null;
+
+    if (!details) {
+      return NextResponse.json({ error: "Invalid command" }, { status: 400 });
+    }
+
     const startResponse = await replicate.predictions.create(details);
     let Response_Id = startResponse.id;
     let output = null;
+
     while (!output) {
       // Loop in 1s intervals until the alt text is ready
       let finalResponse = await replicate.predictions.get(Response_Id);
       if (finalResponse.status === "succeeded") {
         output = finalResponse.output;
       } else if (finalResponse.status === "failed") {
+        console.error("Replicate API failed:", finalResponse);
         break;
       } else {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     }
-    command == "captionize"
-      ? await supabase.from("images_edited").insert([
-          {
-            canvas_id: canvas,
-            url: imageUrl,
-            caption: output.split(":")[1],
-            user_id: userId,
-          },
-        ])
-      : await supabase.from("images_edited").insert([
-          {
-            canvas_id: canvas,
-            url: output,
-            user_id: userId,
-          },
-        ]);
-    return NextResponse.json(output ? output : "Failed to retreive");
+
+    if (!output) {
+      return NextResponse.json({ error: "Failed to retrieve output" }, { status: 500 });
+    }
+
+    if (command === "Captionize") {
+      await supabase.from("images_edited").insert([
+        {
+          canvas_id: canvas,
+          url: imageUrl,
+          caption: output.split(":")[1],
+          user_id: userId,
+        },
+      ]);
+    } else {
+      await supabase.from("images_edited").insert([
+        {
+          canvas_id: canvas,
+          url: output,
+          user_id: userId,
+        },
+      ]);
+    }
+
+    return NextResponse.json(output);
   } catch (error) {
-    return NextResponse.json({ error: error }, { status: 400 });
+    console.error("Error processing image:", error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

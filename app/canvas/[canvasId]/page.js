@@ -188,6 +188,12 @@ export default function CanvasPage() {
         },
         body: JSON.stringify(payload),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Failed to edit image:", data);
+      } else {
+        console.log("Image edited successfully:", data);
+      }
     } catch (error) {
       console.error(error);
     } finally {
