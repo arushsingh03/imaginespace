@@ -13,27 +13,59 @@ export default function DashboardPage() {
   const [canvasItems, setCanvasItems] = useState([]);
   const [user] = useUser();
   const router = useRouter();
-  const id = uuidv4();
 
   const createNewCanvas = async () => {
-    await supabase
-      .from("canvas")
-      .insert([{ canvas_id: id, user_id: user.id }])
-      .select();
+    if (!user?.id) return;
+    const id = uuidv4();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      console.error("No session — sign in again.");
+      return;
+    }
+
+    const res = await fetch("/api/canvas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ canvas_id: id, user_id: user.id }),
+    });
+
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Canvas create failed:", payload);
+      return;
+    }
+
     router.replace(`/canvas/${id}`);
   };
 
   const fetchCanvas = async () => {
-    const { data } = await supabase
-      .from("canvas")
-      .select()
-      .eq("user_id", user?.id)
-      .order("created_at", { ascending: false });
-    setCanvasItems(data);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    const res = await fetch("/api/canvas", {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+
+    if (!res.ok) {
+      console.error("Canvas list failed:", await res.json().catch(() => ({})));
+      setCanvasItems([]);
+      return;
+    }
+
+    const data = await res.json();
+    setCanvasItems(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => {
-    if (!user || !supabase) return;
+    if (!user?.id || !supabase) return;
     fetchCanvas();
   }, [supabase, user]);
 
@@ -58,8 +90,8 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8 w-full">
           {canvasItems.map((item, i) => (
             <Link
-              key={item.id}
-              href={`/canvas/${item.id}`}
+              key={item.canvas_id}
+              href={`/canvas/${item.canvas_id}`}
               className="group relative overflow-hidden rounded-xl bg-purple-950 text-white shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

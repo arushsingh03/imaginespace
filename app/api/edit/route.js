@@ -1,4 +1,4 @@
-import { supabase } from "@/supabase_client";
+import { getSupabaseAdmin } from "@/supabase_admin";
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
 
@@ -86,23 +86,40 @@ export async function POST(req, res) {
       return NextResponse.json({ error: "Failed to retrieve output" }, { status: 500 });
     }
 
-    if (command === "Captionize") {
-      await supabase.from("images_edited").insert([
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json(
         {
-          canvas_id: canvas,
-          url: imageUrl,
-          caption: output.split(":")[1],
-          user_id: userId,
+          error:
+            "Missing SUPABASE_SERVICE_ROLE_KEY — add it in .env.local (Supabase Project Settings → API).",
         },
-      ]);
-    } else {
-      await supabase.from("images_edited").insert([
-        {
-          canvas_id: canvas,
-          url: output,
-          user_id: userId,
-        },
-      ]);
+        { status: 500 }
+      );
+    }
+
+    const row =
+      command === "Captionize"
+        ? {
+            canvas_id: String(canvas),
+            url: imageUrl,
+            caption: output.split(":")[1],
+            user_id: String(userId),
+          }
+        : {
+            canvas_id: String(canvas),
+            url: output,
+            user_id: String(userId),
+          };
+
+    const { error: insertError } = await supabaseAdmin
+      .from("images_edited")
+      .insert([row]);
+    if (insertError) {
+      console.error("images_edited insert failed:", insertError);
+      return NextResponse.json(
+        { error: insertError.message, detail: insertError },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(output);

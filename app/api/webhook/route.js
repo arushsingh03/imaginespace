@@ -1,4 +1,4 @@
-import { supabase } from "@/supabase_client"
+import { getSupabaseAdmin } from "@/supabase_admin"
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 
@@ -21,7 +21,12 @@ export async function POST(req) {
     switch (event.type) {
         case "customer.subscription.created":
             const subscriptionData = event.data.object
-            await supabase.from("subscriptions").insert([{
+            const admin = getSupabaseAdmin()
+            if (!admin) {
+                console.error("SUPABASE_SERVICE_ROLE_KEY missing — cannot record subscription")
+                break
+            }
+            await admin.from("subscriptions").insert([{
                 "sub_id": subscriptionData.id,
                 "user_id": subscriptionData.metadata.userId,
             }]).select()

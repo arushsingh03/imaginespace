@@ -1,4 +1,4 @@
-import { supabase } from "@/supabase_client";
+import { getSupabaseAdmin } from "@/supabase_admin";
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
 
@@ -44,18 +44,67 @@ export async function POST(req, res) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     }
-    for (const url of output) {
-      await supabase.from("images_created").insert([
+
+    if (!output) {
+      return NextResponse.json(
+        { error: "Replicate did not return image output" },
+        { status: 502 }
+      );
+    }
+
+    // Models may return one URL string or an array of URLs — avoid iterating string chars.
+    const urls = Array.isArray(output) ? output : [output];
+
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json(
         {
-          canvas_id: canvas,
+          error:
+            "Missing SUPABASE_SERVICE_ROLE_KEY — server cannot save images when RLS is enabled. Add it in .env.local (Project Settings → API in Supabase).",
+        },
+        { status: 500 }
+      );
+    }
+
+    let insertedCount = 0;
+    for (const url of urls) {
+      if (typeof url !== "string" || !/^https?:\/\//i.test(url)) {
+        console.warn("Skipping non-URL replicate output:", url);
+        continue;
+      }
+      const { error: insertError } = await supabaseAdmin
+        .from("images_created")
+        .insert([
+          {
+            canvas_id: String(canvas),
           url,
           prompt,
           filter: imageParams.filter,
-          user_id: userId,
-        },
-      ]);
+          user_id: userId != null ? String(userId) : userId,
+          },
+        ]);
+      if (insertError) {
+        console.error("images_created insert failed:", insertError);
+        return NextResponse.json(
+          { error: insertError.message, detail: insertError },
+          { status: 500 }
+        );
+      }
+      insertedCount++;
     }
-    return NextResponse.json(output ? output : "Failed to retrieve");
+
+    if (insertedCount === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Replicate returned output in an unexpected shape — no HTTP URLs were saved",
+          replicateOutput: output,
+        },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json(Array.isArray(output) ? output : urls);
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 400 });
   }

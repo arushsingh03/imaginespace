@@ -20,25 +20,22 @@ const UsagePage = () => {
   });
 
   const fetchImages = async () => {
-    const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    const thirtyDaysAgoISOString = thirtyDaysAgo.toISOString();
-    const [createdImgs, editedImgs] = await Promise.all([
-      supabase
-        .from("images_created")
-        .select()
-        .eq("user_id", user?.id)
-        .gte("created_at", thirtyDaysAgoISOString),
-      supabase
-        .from("images_edited")
-        .select()
-        .eq("user_id", user?.id)
-        .gte("created_at", thirtyDaysAgoISOString),
-    ]);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    const res = await fetch("/api/usage-counts", {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Usage counts failed:", data);
+      return;
+    }
     setImagesUsage({
-      created: createdImgs.data.length,
-      edited: editedImgs.data.length,
+      created: data.created ?? 0,
+      edited: data.edited ?? 0,
     });
   };
 

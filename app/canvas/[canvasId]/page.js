@@ -121,6 +121,10 @@ export default function CanvasPage() {
 
   const generateImages = async () => {
     if (prompt.trim() == "" || !prompt) return;
+    if (!user?.id) {
+      console.error("Sign in required to generate images.");
+      return;
+    }
     let payload = {
       prompt,
       imageParams,
@@ -135,31 +139,50 @@ export default function CanvasPage() {
         },
         body: JSON.stringify(payload),
       });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        console.error("Generate failed:", data);
+        return;
+      }
+      fetchNewImages();
+      setTimeout(() => fetchNewImages(), 2500);
     } catch (error) {
       console.error(error);
-    } finally {
-      setTimeout(() => {
-        fetchNewImages();
-      }, 3000);
     }
   };
 
   const fetchNewImages = async () => {
+    if (!canvasId) return;
     setLoading(true);
-    const [images, editedImgs] = await Promise.all([
-      await supabase
-        .from("images_created")
-        .select()
-        .eq("canvas_id", canvasId)
-        .order("created_at", { ascending: false }),
-      await supabase
-        .from("images_edited")
-        .select()
-        .eq("canvas_id", canvasId)
-        .order("created_at", { ascending: false }),
-    ]);
-    setCreatedImages(images.data);
-    setEditedImages(editedImgs.data);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      setCreatedImages([]);
+      setEditedImages([]);
+      setLoading(false);
+      return;
+    }
+
+    const res = await fetch(
+      `/api/canvas-images?canvas_id=${encodeURIComponent(canvasId)}`,
+      {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      }
+    );
+
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Could not load canvas images:", payload);
+      setCreatedImages([]);
+      setEditedImages([]);
+      setLoading(false);
+      return;
+    }
+
+    setCreatedImages(payload.created ?? []);
+    setEditedImages(payload.edited ?? []);
     setLoading(false);
     setSelectedImage("");
     setPrompt("");
@@ -169,10 +192,10 @@ export default function CanvasPage() {
   useEffect(() => {
     if (!supabase || !canvasId) return;
     fetchNewImages();
-  }, [supabase, canvasId]);
+  }, [supabase, canvasId, user?.id]);
 
   const editImage = async () => {
-    if (!selectedImage || loadingEditing) return;
+    if (!selectedImage || loadingEditing || !user?.id) return;
     setLoadingEditing(true);
     let payload = {
       imageUrl: selectedImage.url,
